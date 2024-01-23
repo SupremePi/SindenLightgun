@@ -8,7 +8,7 @@ TITLE="Sinden LightGun"
 MENU="Choose one of the following options:"
 
 OPTIONS=(1 "Install & Setup the Sinden LightGun"
-         2 "Remove & Unistall the Sinden LightGun"
+         2 "Remove & Uninstall the Sinden LightGun"
          3 "Open RetroPie Setup")
 
 CHOICE=$(dialog --clear \
