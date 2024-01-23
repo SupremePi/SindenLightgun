@@ -4,7 +4,7 @@
 ##
 ##   Autostart Options for Sinden Lightgun
 ##   v3.00    January 2024
-##   -- By Widge
+##   -- By Widge & Updated By The SUPREME TEAM
 ##
 ##   For use with Sinden Software v1.08 config files
 ##   and RetroPie on Raspberry Pi 4 and 5 (32/64 bit)
@@ -19,7 +19,7 @@
 
 if [ $USER == "root" ]; then USERNAME=$SUDO_USER; else USERNAME=$USER; fi
 
-backtitle="Autostart Options and Config Editor for Sinden Lightgun - v3.00 -- By Widge"
+backtitle="Autostart Options and Config Editor for Sinden Lightgun - v3.00 -- By Widge & Updated By The SUPREME TEAM"
 utilscfg="/home/$USERNAME/Lightgun/utils/widgeutils.cfg"
 collectiondir="/opt/retropie/configs/all/emulationstation/collections"
 
@@ -1522,10 +1522,10 @@ function uninstall() {
   linedelete "sindenautostart.sh" "/opt/retropie/configs/all/runcommand-onlaunch.sh"
   linedelete "sindenautostart.sh" "/opt/retropie/configs/all/runcommand-onend.sh"
   echo "...Removed references to sindenautostart from EmulationStation files..."
-  /bin/rm -f "/home/$USERNAME/Lightgun/utils/sindenautostart.sh"
+  /bin/rm -f "/home/$USERNAME/Lightgun/utils/sindenautostart.sh" > /dev/null 2>&1
   echo "...Deleted sindenautostart.sh..."
-  bin/rm -f "/home/$USERNAME/RetroPie/roms/sinden/Sinden Lightgun Autostart Options.sh"
-  bin/rm -f "/home/$USERNAME/RetroPie/roms/ports/Sinden Lightgun Autostart Options.sh"
+  bin/rm -f "/home/$USERNAME/RetroPie/roms/sinden/Sinden Lightgun Autostart Options.sh" > /dev/null 2>&1
+  bin/rm -f "/home/$USERNAME/RetroPie/roms/ports/Sinden Lightgun Autostart Options.sh" > /dev/null 2>&1
   echo "...Deleted Options Menu from EmulationStation..."
   echo "Uninstall complete."
 }
