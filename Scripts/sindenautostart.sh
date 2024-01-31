@@ -3,7 +3,7 @@
 ######################################################################
 ##
 ##   Autostart Options for Sinden Lightgun
-##   v3.00    January 2024
+##   v3.03    January 2024
 ##   -- By Widge & Updated By The SUPREME TEAM
 ##
 ##   For use with Sinden Software v1.08 config files
@@ -19,7 +19,7 @@
 
 if [ $USER == "root" ]; then USERNAME=$SUDO_USER; else USERNAME=$USER; fi
 
-backtitle="Autostart Options and Config Editor for Sinden Lightgun - v3.00 -- By Widge & Updated By The SUPREME TEAM"
+backtitle="Autostart Options and Config Editor for Sinden Lightgun - v3.03 -- By Widge & Updated By The SUPREME TEAM"
 utilscfg="/home/$USERNAME/Lightgun/utils/widgeutils.cfg"
 collectiondir="/opt/retropie/configs/all/emulationstation/collections"
 
@@ -64,6 +64,7 @@ function cfgmaker() {
   builder "<ResetTypeP3>" "off" "$utilscfg"
   builder "<ResetTypeP4>" "off" "$utilscfg"
   builder "<LightgunCollectionFile>" "NONE" "$utilscfg"
+  builder "<SetOSReload>" "supermodel3" "$utilscfg"
   chown $USERNAME:$USERNAME $utilscfg
 
   if ! grep -Fq "sindenautostart.sh" "/opt/retropie/configs/all/autostart.sh" ; then
@@ -80,9 +81,7 @@ function cfgmaker() {
 }
 
 
-
 function grabber(){ grep "$1" "$2" | grep -o '".*"' | sed 's/"//g' ; }
-
 
 
 function prep() {
@@ -112,17 +111,14 @@ function prep() {
   cfg_resettypeP3=$(grabber "<ResetTypeP3>" "$utilscfg")
   cfg_resettypeP4=$(grabber "<ResetTypeP4>" "$utilscfg")
   cfg_collectionfile=$(grabber "<LightgunCollectionFile>" "$utilscfg")
+  IFS=' ' read -r -a cfg_osr_list <<< "$(grabber "<SetOSReload>" "$utilscfg")"
 }
-
-
-
 
 
 function areyousure() {
   dialog --defaultno --title "Are you sure?" --backtitle "$backtitle" --yesno "\nAre you sure you want to $1" 10 70 3>&1 1>&2 2>&3
   echo $?
 }
-
 
 
 function applychange () { sed -i -e "/.*${2}/s/\".*\"/\"${3}\"/" ${1} ; }
@@ -133,14 +129,18 @@ function applyconfigchange () { sed -i -e "/.*${2}/s/value=\".*\"/value=\"${3}\"
 
 function getvalues() { grep $1 $sourcefile | grep -o 'value=".*"' | sed 's/value="//g' | sed 's/"//g' ; }
 
+
 function onoffread(){ if [ $2 $1 = "1" ]; then echo "on"; else echo "off"; fi }
 
+
 function onoffwrite() { if [ ! $1 = "1" ]; then echo "1"; else echo "0"; fi }
+
 
 
 ##############################
 ######  CONFIG EDITOR  ######
 ############################
+
 
 function cfgprep() {
 	name_P1_norm="Player1 - NoRecoil"
@@ -169,6 +169,7 @@ function cfgprep() {
   cfg_P4_auto=$(grabber "<P4auto>" "$utilscfg")
 }
 
+
 function filecheck() {
   if ! test -f "$1"; then
     dialog --title "$title" --backtitle "$backtitle" --msgbox "\nThe selected file doesn't exist.\n\n$1" 10 70 3>&1 1>&2 2>&3
@@ -178,7 +179,9 @@ function filecheck() {
   fi
 }
 
+
 function radiocomparison()  { if [ $1 = $2 ]; then echo "on"; else echo "off"; fi }
+
 
 function rangeentry(){
   local title="$1"
@@ -187,7 +190,6 @@ function rangeentry(){
   11 50 $2 $3 $4 3>&1 1>&2 2>&3 )
     echo $selection
 }
-
 
 
 function captivedialog { # usage: captivedialog [duration(s)] [height] [width] [message] [title]
@@ -208,7 +210,6 @@ function captivedialog { # usage: captivedialog [duration(s)] [height] [width] [
     dialog --title "$5" --yes-label " OK " --no-label " Go Back " --yesno "$4" $2 $3
     captivereturn=$?
 }
-
 
 
 function choosefile() { # [title] [message]
@@ -260,7 +261,6 @@ function choosefile() { # [title] [message]
        return
      fi
 }
-
 
 
 function settingstransfer() {
@@ -361,7 +361,6 @@ function recoilprep() {
 }
 
 
-
 function termsandcond(){ 
   local licensetxt
   local title
@@ -378,8 +377,6 @@ function termsandcond(){
     recoilmenuitem=9
   fi  
 }
-
-
 
 
 function recoilvalues() {
@@ -434,7 +431,6 @@ function recoilvalues() {
 }
 
 
-
 function f_recoiltype(){
   local title
   local selection
@@ -450,7 +446,6 @@ function f_recoiltype(){
       2) v_recoiltype="1" ;;
     esac
 }
-
 
 
 function recoilbuttons(){
@@ -478,7 +473,6 @@ function recoilbuttons(){
   if grep -q "7" <<< "$selection"; then v_recbl="1";        else v_recbl="0"; fi
   if grep -q "8" <<< "$selection"; then v_recbr="1";        else v_recbr="0"; fi
 }
-
 
 
 function recoilmenu(){
@@ -523,7 +517,6 @@ function recoilmenu(){
 }
 
 
-
 function recoilchoosefile() {
   local title
   local selection
@@ -537,7 +530,6 @@ function recoilchoosefile() {
          recoilmenuitem=9
      fi
 }
-
 
 
 function recoilmain(){
@@ -558,10 +550,10 @@ function recoilmain(){
 }
 
 
+
 #########################
 #  Camera
 #########################
-
 
 
 function cameraprep() {
@@ -627,7 +619,6 @@ function cameramenu() {
 }
 
 
-
 function camerachoosefile(){
   local title
   local selection
@@ -641,7 +632,6 @@ function camerachoosefile(){
          cameramenuitem=9
      fi
 }
-
 
 
 function cameramain(){
@@ -659,12 +649,9 @@ function cameramain(){
 
 
 
-
 #########################
 #  Buttons
 #########################
-
-
 
 
 function buttonprep() {
@@ -760,7 +747,6 @@ function savebuttons() {
 }
 
 
-
 function buttonselector(){
   local title
   local selection
@@ -844,8 +830,6 @@ function buttonselector(){
 }
 
 
-
-
 function buttonsonscreen() {
   local title
   local selection
@@ -880,7 +864,6 @@ function buttonsonscreen() {
     esac
   done
 }
-
 
 
 function buttonsoffscreen() {
@@ -919,7 +902,6 @@ function buttonsoffscreen() {
 }
 
 
-
 function buttononoffmenu(){
   local title
   local selection
@@ -950,7 +932,6 @@ function buttononoffmenu(){
           *) buttonmenuitem=9; return ;;
         esac
 }
-
 
 
 function buttonchoosefile(){
@@ -990,12 +971,9 @@ function buttonmain(){
 
 
 
-
-
 #########################
 #  Backup
 #########################
-
 
 
 function restorebackup() {
@@ -1019,7 +997,6 @@ function restorebackup() {
 }
 
 
-
 function makebackup(){
   local title
   local selection
@@ -1041,9 +1018,6 @@ function makebackup(){
 }
 
 
-
-
-
 function backupmenu() {
   local title
   local selection
@@ -1063,8 +1037,6 @@ function backupmenu() {
 }
 
 
-
-
 function backupmain(){
   backupmenuitem=0
   while ! [[ $backupmenuitem -eq 9 ]]; do
@@ -1074,8 +1046,6 @@ function backupmain(){
     esac
   done
 }
-
-
 
 
 
@@ -1114,18 +1084,88 @@ function cfgeditmenu(){
 
 
 
-
-
 ##############################
 ############  MAIN  #########
 ############################
 
+
 function gunsexist() {
-	P1exists=$( [ -e /dev/ttyACM0 ] && echo "true" || echo "false" )
-	P2exists=$( [ -e /dev/ttyACM1 ] && echo "true" || echo "false" )
-	P3exists=$( [ -e /dev/ttyACM2 ] && echo "true" || echo "false" )
-	P4exists=$( [ -e /dev/ttyACM3 ] && echo "true" || echo "false" )
+
+	lightgun_files=()
+	pedal_files=()
+	local device_file
+
+	for device_file in /dev/ttyACM*; do
+		udev_info=$(udevadm info --query=all --name="$device_file")
+		if [[ $udev_info =~ "SindenLightgun" ]]; then
+			lightgun_files+=("$device_file")
+		fi
+	done
+	
+	for device_file in /dev/input/event*; do
+		udev_info=$(udevadm info --query=all --name="$device_file")
+		if [[ $udev_info =~ "Sinden_Pedal" ]]; then
+			pedal_files+=("$device_file")
+		fi
+	done
 }
+
+
+function run_pedaltest() {
+
+	local title="Sinden Pedal Test"
+	local PEDAL_BTN=()
+	local device_file=${pedal_files[$1]}
+	
+	devNum=$((10#${lightgun_files[$i]##*[!0-9]} + 1)) 
+			
+	dialog --title "$title" --backtitle "$backtitle" --infobox \
+	"\n   Press the pedal\n\n(You have 10 seconds)" 7 25 3>&1 1>&2 2>&3
+	timeout 10 evtest --grab "$device_file" | grep -m 1 "KEY),\|BTN)," | awk -F'[()]' '{print $(NF-1)}' > "/tmp/evtest_output" && sudo pkill evtest &
+	local EVTEST_PID=$!
+	wait $EVTEST_PID
+	if [ -s /tmp/evtest_output ]; then
+		PEDAL_BTN=$(cat /tmp/evtest_output)
+		dialog --title "$title" --backtitle "$backtitle" --infobox "\n  Pedal is sending\n\n       "$PEDAL_BTN 7 25 3>&1 1>&2 2>&3
+	else
+		dialog --title "$title" --backtitle "$backtitle" --infobox "\n\nNo pedal button detected" 7 28 3>&1 1>&2 2>&3
+	fi
+  sleep 3
+}
+
+
+function pedaltest_menu(){
+	local title
+	local selection
+	local menu_items
+
+	if [ -z "${pedal_files[0]}" ]; then
+		dialog --title "$title" --backtitle "$backtitle" --infobox "\nNo Sinden pedals connected" 5 30 3>&1 1>&2 2>&3
+		sleep 3
+	else
+		while :; do
+			gunsexist
+			menu_items=()
+			if [ -n "${pedal_files[0]}" ]; then menu_items+=("1" "Pedal 1"); fi
+			if [ -n "${pedal_files[1]}" ]; then menu_items+=("2" "Pedal 2"); fi
+			if [ -n "${pedal_files[2]}" ]; then menu_items+=("3" "Pedal 3"); fi
+			if [ -n "${pedal_files[3]}" ]; then menu_items+=("4" "Pedal 4"); fi
+			title="Test Sinden Pedals"
+			selection=$(dialog --cancel-label " Back " --title "$title" --backtitle "$backtitle" --menu \
+			  "\nWhich pedal do you want to test/calibrate?\n\nNote: Only connected Sinden pedals are shown here.\n\nIf you have multiple pedals sending the same key, then you should change one of them using the Windows pedal configuration software." \
+			  19 50 12 "${menu_items[@]}" 3>&1 1>&2 2>&3 )
+			case "$selection" in
+				1) run_pedaltest "0";;
+				2) run_pedaltest "1";;
+				3) run_pedaltest "2";;
+				4) run_pedaltest "3";;
+				" ") ;;
+				*) return ;;
+			esac
+		done
+	fi
+}
+
 
 function savechanges() {
   local yn
@@ -1149,24 +1189,24 @@ function savechanges() {
     done ) |
     dialog --title "Saving..." --gauge "$4" 5 30 $percent
 
-    applychange "$utilscfg" "AutostartEnable"        $cfg_enable           
-    applychange "$utilscfg" "RecoilTypeP1"           $cfg_recoiltypeP1     
-    applychange "$utilscfg" "RecoilTypeP2"           $cfg_recoiltypeP2     
-    applychange "$utilscfg" "RecoilTypeP3"           $cfg_recoiltypeP3     
-    applychange "$utilscfg" "RecoilTypeP4"           $cfg_recoiltypeP4     
-    applychange "$utilscfg" "RecoilReset"            $cfg_recoilreset
-    applychange "$utilscfg" "ResetTypeP1"            $cfg_resettypeP1     
-    applychange "$utilscfg" "ResetTypeP2"            $cfg_resettypeP2     
-    applychange "$utilscfg" "ResetTypeP3"            $cfg_resettypeP3     
-    applychange "$utilscfg" "ResetTypeP4"            $cfg_resettypeP4     
+    applychange "$utilscfg" "AutostartEnable"         $cfg_enable           
+    applychange "$utilscfg" "RecoilTypeP1"            $cfg_recoiltypeP1     
+    applychange "$utilscfg" "RecoilTypeP2"            $cfg_recoiltypeP2     
+    applychange "$utilscfg" "RecoilTypeP3"            $cfg_recoiltypeP3     
+    applychange "$utilscfg" "RecoilTypeP4"            $cfg_recoiltypeP4     
+    applychange "$utilscfg" "RecoilReset"             $cfg_recoilreset
+    applychange "$utilscfg" "ResetTypeP1"             $cfg_resettypeP1     
+    applychange "$utilscfg" "ResetTypeP2"             $cfg_resettypeP2     
+    applychange "$utilscfg" "ResetTypeP3"             $cfg_resettypeP3     
+    applychange "$utilscfg" "ResetTypeP4"             $cfg_resettypeP4     
     applychange "$utilscfg" "LightgunCollectionFile" "$cfg_collectionfile"
+	applychange "$utilscfg" "SetOSReload" 			 "$(echo ${cfg_osr_list[@]})"
 
   else
     dialog --title "SAVE" --infobox "CANCELLED" 3 13
   fi
 
 }
-
 
 
 function comparetypes(){
@@ -1176,6 +1216,7 @@ function comparetypes(){
     grecoil="individual"
   fi
 }
+
 
 function compareresettypes(){
   if [ "$cfg_resettypeP1" = "$cfg_resettypeP2" ] && [ "$cfg_resettypeP2" = "$cfg_resettypeP3" ] && [ "$cfg_resettypeP3" = "$cfg_resettypeP4" ]; then
@@ -1272,7 +1313,6 @@ function set_reset_global(){
 }
 
 
-
 function set_collectionfile(){
   local title="Set your Lightgun Games Collection file."
   local selection
@@ -1312,6 +1352,7 @@ function manual_start() {
   sleep 4
 }
 
+
 function manual_stop() {
 
   stopguns
@@ -1321,46 +1362,92 @@ function manual_stop() {
 
 }
 
+
 function run_test(){
 #  clear
+  local devNum
   stopguns
   manualstart=false
-  var="cfg_"$1"_norm"
+  var="cfg_P"$1"_norm"
   cd "${!var%/*}"
   sudo mono "${!var%.config}" sdl 30
+  sleep 3
 }
+
 
 function test_menu(){
-  local title
-  local selection
-  local menu_items
+	local title
+	local selection
+	local menu_items
 
+	if [ -z "${lightgun_files[0]}" ]; then
+		dialog --title "$title" --backtitle "$backtitle" --infobox "\nNo Sinden Lightguns connected" 5 33 3>&1 1>&2 2>&3
+		sleep 3
+	else
+		while :; do
+			gunsexist
+			menu_items=()
+			if [ -n "${lightgun_files[0]}" ]; then menu_items+=("1" "Player 1"); fi
+			if [ -n "${lightgun_files[1]}" ]; then menu_items+=("2" "Player 2"); fi
+			if [ -n "${lightgun_files[2]}" ]; then menu_items+=("3" "Player 3"); fi
+			if [ -n "${lightgun_files[3]}" ]; then menu_items+=("4" "Player 4"); fi
+			title="Sinden Test and Calibration"
+			selection=$(dialog --cancel-label " Back " --title "$title" --backtitle "$backtitle" --menu \
+			"\nWhich gun do you want to test/calibrate?\n\nNote: Running a test will stop any manually started running Lightgun processes" \
+			16 50 12 "${menu_items[@]}" 3>&1 1>&2 2>&3 )
+			case "$selection" in
+				1) run_test "1";;
+				2) run_test "2";;
+				3) run_test "3";;
+				4) run_test "4";;
+				" ") ;;
+				*) return ;;
+			esac
+		done
+	fi
 
-  while :; do
-    gunsexist
-    menu_items=()
-    if [ "$P1exists" = true ]; then menu_items+=("1" "Player 1"); fi
-    if [ "$P2exists" = true ]; then menu_items+=("2" "Player 2"); fi
-    if [ "$P3exists" = true ]; then menu_items+=("3" "Player 3"); fi
-    if [ "$P4exists" = true ]; then menu_items+=("4" "Player 4"); fi
-    title="Sinden Test and Calibration"
-    selection=$(dialog --cancel-label " Back " --title "$title" --backtitle "$backtitle" --menu \
-      "\nWhich gun do you want to test/calibrate?\n\nNote: Running a test will stop any manually started running Lightgun processes" \
-      16 50 12 "${menu_items[@]}" 3>&1 1>&2 2>&3 )
-	
-          case "$selection" in
-            1) run_test "P1";;
-            2) run_test "P2";;
-            3) run_test "P3";;
-            4) run_test "P4";;
-			" ") ;;
-            *) return ;;
-          esac
-  done
 }
+
+function set_osr_usage(){
+
+	local title="Setting Offscreen Reload"
+	local menu_items=()
+	local selected_items=()
+	local osr_item
+	local status
+	local index
+	local item
+	local emu_list=($(find "/opt/retropie/configs/" -maxdepth 1 -type d ! -name "all" -exec test -e {}/emulators.cfg \; -exec grep -hoP '^[^=]+' {}/emulators.cfg \; | grep -v "default" | sort -u))
+
+
+	for ((i=0; i<${#emu_list[@]}; i++)); do
+		status="off"
+		for osr_item in "${cfg_osr_list[@]}"; do
+			if [[ "${emu_list[i]}" == "$osr_item" ]]; then
+				status="on"
+				break
+			fi
+		done
+		menu_items+="$((i+1)) ${emu_list[i]} $status "
+	done
+
+	local dialog_result=$(dialog --separate-output --title "$title" --backtitle "$backtitle" --checklist "\nChoose the emulators for which the Offscreen Reload setting in the Sinden configs should be applied:" 23 70 12 ${menu_items[@]} 3>&1 1>&2 2>&3 )
+
+	if [ $? -eq 0 ]; then
+		cfg_osr_list=()
+		for item in $dialog_result; do selected_items+=("$item"); done
+		
+		for item in "${selected_items[@]}"; do
+			index=$((item-1))
+			cfg_osr_list+=("${emu_list[index]}")
+		done
+	fi
+}
+
 #########################
 #  Options
 #########################
+
 
 function moremenu(){
   local title
@@ -1379,8 +1466,10 @@ function moremenu(){
     menu_items+=("G"  "Set Global Reset Type     : $greset") 
     menu_items+=(" "  "                                      ")
     menu_items+=("C"  "Set Lightgun Collection File")
+    menu_items+=("O"  "Set O/S Reload Usage")
     menu_items+=(" "  "                                      ")
     menu_items+=("T"  "Test and Calibrate Lightguns")
+	menu_items+=("P"  "Test Sinden Pedals")
 	menu_items+=(" "  "                                      ")
     menu_items+=("E"  "Lightgun Config Editor")
 
@@ -1395,14 +1484,15 @@ function moremenu(){
             4) set_reset "P4";;
             G) set_reset_global ;;
             C) set_collectionfile ;;
+			O) set_osr_usage ;;
 			T) test_menu ;;
+			P) pedaltest_menu ;;
 			E) cfgeditmenu ;;
 			" ") ;;
             *)  if [ $? -eq 2 ]; then showhelp; else return; fi;;
           esac
   done
 }
-
 
 
 function mainmenu(){
@@ -1417,10 +1507,10 @@ function mainmenu(){
     menu_items+=("A"  "Autostart Lightguns       : $(onoffread $cfg_enable)")
     menu_items+=(" "  "                                      ")
     menu_items+=("G"  "Set States Globally       : $grecoil") 
-    if [ "$P1exists" = true ]; then menu_items+=("1"  "Player 1                  : $cfg_recoiltypeP1"); fi
-    if [ "$P2exists" = true ]; then menu_items+=("2"  "Player 2                  : $cfg_recoiltypeP2"); fi
-    if [ "$P3exists" = true ]; then menu_items+=("3"  "Player 3                  : $cfg_recoiltypeP3"); fi
-    if [ "$P4exists" = true ]; then menu_items+=("4"  "Player 4                  : $cfg_recoiltypeP4"); fi
+    if [ -n "${lightgun_files[0]}" ]; then menu_items+=("1"  "Player 1                  : $cfg_recoiltypeP1"); fi
+    if [ -n "${lightgun_files[1]}" ]; then menu_items+=("2"  "Player 2                  : $cfg_recoiltypeP2"); fi
+    if [ -n "${lightgun_files[2]}" ]; then menu_items+=("3"  "Player 3                  : $cfg_recoiltypeP3"); fi
+    if [ -n "${lightgun_files[3]}" ]; then menu_items+=("4"  "Player 4                  : $cfg_recoiltypeP4"); fi
     menu_items+=(" "  "                                      ")
     menu_items+=("S"  "Save Changes")
     menu_items+=("X"  "Reset Unsaved Changes")
@@ -1462,12 +1552,11 @@ function showhelp() {
   local title
   helptxt="/home/$USERNAME/Lightgun/utils/help.txt"
   title="Sinden Lightgun Autostart Options Help"
-  dialog --scrollbar --no-collapse --title "$title" --backtitle "$backtitle" --msgbox "$(head -c 3K $helptxt)" 35 70
-  
-
+  dialog --scrollbar --no-collapse --title "$title" --backtitle "$backtitle" --msgbox "$(head -c 5K $helptxt)" 35 70
   sleep 3
   echo $?
 }
+
 
 
 #########################
@@ -1502,6 +1591,7 @@ function recoilreset(){
 }
 
 
+
 #########################
 #  Uninstall
 #########################
@@ -1511,9 +1601,10 @@ function linedelete(){
   sed -i "/$1/d" $2
 }
 
+
 function uninstall() {
   local yn
-  echo "This command will uninstall Sinded Autostart."
+  echo "This command will uninstall Sinden Autostart."
   echo " : Proceeding with uninstall!"
   
   applychange "$utilscfg" "AutostartEnable"        "0"
@@ -1522,18 +1613,19 @@ function uninstall() {
   linedelete "sindenautostart.sh" "/opt/retropie/configs/all/runcommand-onlaunch.sh"
   linedelete "sindenautostart.sh" "/opt/retropie/configs/all/runcommand-onend.sh"
   echo "...Removed references to sindenautostart from EmulationStation files..."
-  /bin/rm -f "/home/$USERNAME/Lightgun/utils/sindenautostart.sh" > /dev/null 2>&1
+  /bin/rm -f "/home/$USERNAME/Lightgun/utils/sindenautostart.sh"
   echo "...Deleted sindenautostart.sh..."
-  bin/rm -f "/home/$USERNAME/RetroPie/roms/sinden/Sinden Lightgun Autostart Options.sh" > /dev/null 2>&1
-  bin/rm -f "/home/$USERNAME/RetroPie/roms/ports/Sinden Lightgun Autostart Options.sh" > /dev/null 2>&1
+  bin/rm -f "/home/$USERNAME/RetroPie/roms/sinden/Sinden Lightgun Autostart Options.sh"
+  bin/rm -f "/home/$USERNAME/RetroPie/roms/ports/Sinden Lightgun Autostart Options.sh"
   echo "...Deleted Options Menu from EmulationStation..."
   echo "Uninstall complete."
 }
 
+
+
 #########################
 #  Autostart
 #########################
-
 
 
 function enable_os_reload_buttons() {		## ## -- Required for Supermodel o/s reloading. Can be deleted if o/s reload toggle is implemented in Sinden driver release (see Autostart section below)
@@ -1551,6 +1643,7 @@ function enable_os_reload_buttons() {		## ## -- Required for Supermodel o/s relo
 	sed -i -e "/.*\"OffscreenReload\"/s/value=\".*\"/value=\"1\"/" $cfg_P4_auto
 	
 }
+
 
 function disable_os_reload_buttons() {		## ## -- Required for Supermodel o/s reloading. Can be deleted if o/s reload toggle is implemented in Sinden driver release (see Autostart section below)
 	sed -i -e "/.*\"OffscreenReload\"/s/value=\".*\"/value=\"0\"/" $cfg_P1_norm
@@ -1573,63 +1666,48 @@ function autostart(){
   local rc_emu="$2"
   local rc_rom="$3"
   local rc_collection="$collectiondir/$cfg_collectionfile"
-  local player1
-  local player2
-  local player3
-  local player4
+  local playerNum; local devNum
+  local i; local j
+  local item
 
   if  fgrep -q "$rc_rom" "$rc_collection" || [ $cfg_collectionfile = "NONE" ]; then
-    player1="cfg_P1_"
-    player2="cfg_P2_"
-    player3="cfg_P3_"
-    player4="cfg_P4_"
-    case "$cfg_recoiltypeP1" in
-      single) player1=$player1"reco" ;;
-      auto)   player1=$player1"auto" ;;
-      *)      player1=$player1"norm" ;;
-    esac
-    case "$cfg_recoiltypeP2" in
-      single) player2=$player2"reco" ;;
-      auto)   player2=$player2"auto" ;;
-      *)      player2=$player2"norm" ;;
-    esac
-    case "$cfg_recoiltypeP3" in
-      single) player3=$player3"reco" ;;
-      auto)   player3=$player3"auto" ;;
-      *)      player3=$player3"norm" ;;
-    esac
-    case "$cfg_recoiltypeP4" in
-      single) player4=$player4"reco" ;;
-      auto)   player4=$player4"auto" ;;
-      *)      player4=$player4"norm" ;;
-    esac
+  
+	
+	 for item in "${cfg_osr_list[@]}"; do
+        if [[ "$rc_emu" == "$item" ]]; then
+            echo "Emulator $rc_emu detected. Enabling offscreen reloading..."
+			sleep 3
+            enable_os_reload_buttons
+			break
+        fi
+    done
 	
 	gunsexist
+	 
+	for ((i=0; i<4; i++)); do
+		j=$((i + 1))  # Increment the value of i to get j
+		if [ -n "${lightgun_files[$i]}" ]; then
+			devNum=$((10#${lightgun_files[$i]##*[!0-9]} + 1)) 
+			player="cfg_P"$j"_"
 
-    if [ "$rc_emu" = "supermodel3" ]; then  ## ## SM3 (specifically Lost World) can't handle o/s reloading by itself, so requires the sinden options to be enabled.
-      	echo "Supermodel3 detected. Enabling offscreen reloading..."
-		enable_os_reload_buttons
-    fi
+			case "${cfg_recoiltypeP1}" in
+				single) player="${player}reco" ;;
+				auto)   player="${player}auto" ;;
+				*)      player="${player}norm" ;;
+			esac
 
+			if [ "${cfg_recoiltypeP1}" != "off" ] && [ -n "${lightgun_files[$i]}" ]; then
+				cd "${!player%/*}"
+				sudo mono-service "${!player%.config}"
+			fi 
+		fi
+	done
+	sleep 5
 
-    if [ ! $cfg_recoiltypeP1 = "off" ] && [ "$P1exists" = true ]; then
-	  cd "${!player1%/*}"
-	  sudo mono-service "${!player1%.config}"
-    fi 
-    if [ ! $cfg_recoiltypeP2 = "off" ] && [ "$P2exists" = true ]; then
-	  cd "${!player2%/*}"
-      sudo mono-service "${!player2%.config}"
-    fi
-    if [ ! $cfg_recoiltypeP3 = "off" ] && [ "$P2exists" = true ]; then
-	  cd "${!player3%/*}"
-	  sudo mono-service "${!player3%.config}"
-	fi
-    if [ ! $cfg_recoiltypeP4 = "off" ] && [ "$P3exists" = true ]; then
-	  cd "${!player4%/*}"
-	  sudo mono-service "${!player4%.config}"
-    fi
   fi
 }
+
+
 
 #############################
 ############  START  #######
