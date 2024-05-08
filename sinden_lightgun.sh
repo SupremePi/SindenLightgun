@@ -12,7 +12,11 @@ rp_module_section="exp"
 rp_module_flags="rpi4 rpi5 rpi"
 
 function depends_sinden_lightgun() {
-    getDepends mono-complete v4l-utils libsdl1.2-dev libsdl-image1.2-dev libjpeg-dev xmlstarlet evtest
+    local depends=(mono-complete v4l-utils libsdl1.2-dev libsdl-image1.2-dev libjpeg-dev xmlstarlet evtest fbi)
+    if isPlatform "64bit"; then
+        depends+=(libsdl2-dev libsdl2-image-dev)
+    fi
+    getDepends "${depends[@]}"
 }
 
 function sources_sinden_lightgun() {
@@ -44,13 +48,14 @@ if [[ "$md_mode" == "install" ]]; then
 
     cp -v "$md_build/Scripts/sindenautostart.sh" "$home/Lightgun/utils"
     cp -v "$md_build/Scripts/recoiltcs.txt" "$home/Lightgun/utils"
-    cp -v "$md_build/Scripts/help.txt" "$home/Lightgun/utils"
+    cp -v "$md_build/Scripts/*.txt" "$home/Lightgun/utils"
+    cp -v "$md_build/Scripts/*.png" "$home/Lightgun/utils"
     cp -v $md_build/Borders/* /opt/retropie/emulators/retroarch/overlays/
 	
 	## Check if on a Supreme Build ##
 	if [[ -d $home/.supreme_toolkit/sb_toolkit/retropie-gml-pi5 ]]; then
-        cp -v "$md_build/Scripts/Sinden Lightgun.sh" "$home/RetroPie/retropiemenu/controllertools/"
-        cp -v "$md_build/Scripts/sinden.png" "$home/RetroPie/retropiemenu/icons/"
+    cp -v "$md_build/Scripts/Sinden Lightgun.sh" "$home/RetroPie/retropiemenu/controllertools/"
+    cp -v "$md_build/Scripts/sinden.png" "$home/RetroPie/retropiemenu/icons/"
 	cp -v "$md_build/Scripts/Sinden Lightgun.sh" "$home/.supreme_toolkit/sb_toolkit/retropiemenu-pi5/controllertools/"
 	cp -v "$md_build/Scripts/sinden.png" "$home/.supreme_toolkit/sb_toolkit/retropiemenu-pi5/icons/"	
 	else
@@ -154,6 +159,25 @@ elif [[ "$md_mode" == "remove" ]]; then
     fi  
     fi
 	
+fi
+
+# Update this script with the latest version from the (github) repo.
+# This is in case new dependencies are needed in future versions.
+local searchterm1='rp_module_id="sinden_lightgun"'
+local searchterm2='rp_module_desc="Sinden Lightgun Stuff"'
+local location="$(cd "$(dirname "$0")" && pwd)/ext"
+echo "Searching for location of RetroPie-Setup sinden_lightgun install script..."
+
+if [ ! -d "$location" ]; then
+	echo "Unable to find location. RetroPie-Setup sinden_lightgun install script not updated with server version."
+else
+    found=$(grep -rl --include="*.sh" "$searchterm1" "$location" | xargs grep -l "$searchterm2")
+    if [ -n "$found" ]; then
+        echo "Updating RetroPie-Setup sinden_lightgun install script with server version."
+		cp -v "$md_build/sinden_lightgun.sh" $found
+    else
+        echo "Unable to find location. RetroPie-Setup sinden_lightgun install script not updated with server version."
+    fi
 fi
   
 }

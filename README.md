@@ -1,5 +1,7 @@
 SINDEN LIGHTGUN INSTALLER BY WIDGE-5 & UPDATED BY THE SUPREME TEAM
 
+Current version is v3.05
+
 To install or remove from CLI:
 
 curl -sSL https://raw.githubusercontent.com/SupremePi/SindenLightgun/main/installer.sh | bash

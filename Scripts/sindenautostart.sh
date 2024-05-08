@@ -3,8 +3,8 @@
 ######################################################################
 ##
 ##   Autostart Options for Sinden Lightgun
-##   v3.03    January 2024
-##   -- By Widge & Updated By The SUPREME TEAM
+##   v3.05    April 2024
+##   -- By Widge
 ##
 ##   For use with Sinden Software v1.08 config files
 ##   and RetroPie on Raspberry Pi 4 and 5 (32/64 bit)
@@ -19,7 +19,7 @@
 
 if [ $USER == "root" ]; then USERNAME=$SUDO_USER; else USERNAME=$USER; fi
 
-backtitle="Autostart Options and Config Editor for Sinden Lightgun - v3.03 -- By Widge & Updated By The SUPREME TEAM"
+backtitle="Autostart Options and Config Editor for Sinden Lightgun - v3.05 -- By Widge"
 utilscfg="/home/$USERNAME/Lightgun/utils/widgeutils.cfg"
 collectiondir="/opt/retropie/configs/all/emulationstation/collections"
 
@@ -54,15 +54,15 @@ function cfgmaker() {
     echo >> $utilscfg
   fi
   builder "<AutostartEnable>" "0" "$utilscfg"
-  builder "<RecoilTypeP1>" "off" "$utilscfg"
-  builder "<RecoilTypeP2>" "off" "$utilscfg"
-  builder "<RecoilTypeP3>" "off" "$utilscfg"
-  builder "<RecoilTypeP4>" "off" "$utilscfg"
+  builder "<RecoilTypeP1>" "silent" "$utilscfg"
+  builder "<RecoilTypeP2>" "silent" "$utilscfg"
+  builder "<RecoilTypeP3>" "silent" "$utilscfg"
+  builder "<RecoilTypeP4>" "silent" "$utilscfg"
   builder "<RecoilReset>" "0" "$utilscfg"
-  builder "<ResetTypeP1>" "off" "$utilscfg"
-  builder "<ResetTypeP2>" "off" "$utilscfg"
-  builder "<ResetTypeP3>" "off" "$utilscfg"
-  builder "<ResetTypeP4>" "off" "$utilscfg"
+  builder "<ResetTypeP1>" "silent" "$utilscfg"
+  builder "<ResetTypeP2>" "silent" "$utilscfg"
+  builder "<ResetTypeP3>" "silent" "$utilscfg"
+  builder "<ResetTypeP4>" "silent" "$utilscfg"
   builder "<LightgunCollectionFile>" "NONE" "$utilscfg"
   builder "<SetOSReload>" "supermodel3" "$utilscfg"
   chown $USERNAME:$USERNAME $utilscfg
@@ -85,6 +85,11 @@ function grabber(){ grep "$1" "$2" | grep -o '".*"' | sed 's/"//g' ; }
 
 
 function prep() {
+
+  if !(ls /dev/input/by-id | grep -q "SindenCam"); then
+    ln -s /dev/video0 /dev/input/by-id/SindenCam
+  fi
+
   manualstart=false
   cfgmaker
   cfg_P1_norm=$(grabber "<P1normal>" "$utilscfg")
@@ -1121,7 +1126,7 @@ function run_pedaltest() {
 			
 	dialog --title "$title" --backtitle "$backtitle" --infobox \
 	"\n   Press the pedal\n\n(You have 10 seconds)" 7 25 3>&1 1>&2 2>&3
-	timeout 10 evtest --grab "$device_file" | grep -m 1 "KEY),\|BTN)," | awk -F'[()]' '{print $(NF-1)}' > "/tmp/evtest_output" && sudo pkill evtest &
+	timeout 10 evtest --grab "$device_file" | grep -m 1 "KEY),\|BTN)," | awk -F'[()]' '{print $(NF-1)}' > "/tmp/evtest_output" && pkill evtest &
 	local EVTEST_PID=$!
 	wait $EVTEST_PID
 	if [ -s /tmp/evtest_output ]; then
@@ -1231,11 +1236,9 @@ function set_recoil(){
   local var
   var="cfg_recoiltype"$1
   case "${!var}" in
-    off)    export "$var=silent" ;;
-    silent)    export "$var=single" ;;
-    single) export "$var=auto"   ;;
-    auto)   export "$var=off"    ;;
-    *)      export "$var=off"    ;;
+    "silent") export "$var=single"	;;
+    "single") export "$var=auto"	;;
+    "auto"|*) export "$var=silent"	;;
   esac
 }
 
@@ -1244,23 +1247,15 @@ function set_reset(){
   local var
   var="cfg_resettype"$1
   case "${!var}" in
-    off)    export "$var=silent" ;;
-    silent)    export "$var=single" ;;
-    single) export "$var=auto"   ;;
-    auto)   export "$var=off"    ;;
-    *)      export "$var=off"    ;;
+    "silent") export "$var=single"	;;
+    "single") export "$var=auto"	;;
+    "auto"|*) export "$var=silent"	;;
   esac
 }
 
 
 function set_global(){
   case "$grecoil" in
-    "inividual"|"all off")
-        cfg_recoiltypeP1="silent"
-        cfg_recoiltypeP2="silent"
-        cfg_recoiltypeP3="silent"
-        cfg_recoiltypeP4="silent"
-        ;;
     "all silent")
         cfg_recoiltypeP1="single"
         cfg_recoiltypeP2="single"
@@ -1273,11 +1268,11 @@ function set_global(){
         cfg_recoiltypeP3="auto"
         cfg_recoiltypeP4="auto"
         ;;
-    "all auto"|*)
-        cfg_recoiltypeP1="off"
-        cfg_recoiltypeP2="off"
-        cfg_recoiltypeP3="off"
-        cfg_recoiltypeP4="off"
+    "all auto"|"individual"|*)
+        cfg_recoiltypeP1="silent"
+        cfg_recoiltypeP2="silent"
+        cfg_recoiltypeP3="silent"
+        cfg_recoiltypeP4="silent"
         ;;
   esac
 }
@@ -1285,12 +1280,7 @@ function set_global(){
 
 function set_reset_global(){
   case "$greset" in
-    "inividual"|"all off")
-        cfg_resettypeP1="silent"
-        cfg_resettypeP2="silent"
-        cfg_resettypeP3="silent"
-        cfg_resettypeP4="silent"
-        ;;
+
     "all silent")
         cfg_resettypeP1="single"
         cfg_resettypeP2="single"
@@ -1303,11 +1293,11 @@ function set_reset_global(){
         cfg_resettypeP3="auto"
         cfg_resettypeP4="auto"
         ;;
-    "all auto"|*)
-        cfg_resettypeP1="off"
-        cfg_resettypeP2="off"
-        cfg_resettypeP3="off"
-        cfg_resettypeP4="off"
+    "all auto"|"individual"|*)
+        cfg_resettypeP1="silent"
+        cfg_resettypeP2="silent"
+        cfg_resettypeP3="silent"
+        cfg_resettypeP4="silent"
         ;;
   esac
 }
@@ -1370,7 +1360,7 @@ function run_test(){
   manualstart=false
   var="cfg_P"$1"_norm"
   cd "${!var%/*}"
-  sudo mono "${!var%.config}" sdl 30
+  mono "${!var%.config}" sdl 30
   sleep 3
 }
 
@@ -1565,8 +1555,8 @@ function showhelp() {
 
 
 function stopguns(){
-    sudo pkill -9 -f "mono"
-    sudo rm /tmp/LightgunMono* -f
+    pkill -9 -f "mono"
+    rm /tmp/LightgunMono* -f
 	disable_os_reload_buttons
 }
 
@@ -1666,7 +1656,7 @@ function autostart(){
   local rc_emu="$2"
   local rc_rom="$3"
   local rc_collection="$collectiondir/$cfg_collectionfile"
-  local playerNum; local devNum
+  local player; local devNum; local typeVar
   local i; local j
   local item
 
@@ -1690,15 +1680,16 @@ function autostart(){
 			devNum=$((10#${lightgun_files[$i]##*[!0-9]} + 1)) 
 			player="cfg_P"$j"_"
 
-			case "${cfg_recoiltypeP1}" in
+			typeVar="cfg_recoiltypeP${j}"
+			case "${!typeVar}" in
 				single) player="${player}reco" ;;
 				auto)   player="${player}auto" ;;
 				*)      player="${player}norm" ;;
 			esac
 
-			if [ "${cfg_recoiltypeP1}" != "off" ] && [ -n "${lightgun_files[$i]}" ]; then
+			if [ -n "${lightgun_files[$i]}" ]; then
 				cd "${!player%/*}"
-				sudo mono-service "${!player%.config}"
+				mono-service "${!player%.config}"
 			fi 
 		fi
 	done
