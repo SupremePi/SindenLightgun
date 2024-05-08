@@ -4,7 +4,7 @@
 ##
 ##   Autostart Options for Sinden Lightgun
 ##   v3.05    April 2024
-##   -- By Widge
+##   -- By Widge & Updated By The SUPREME TEAM
 ##
 ##   For use with Sinden Software v1.08 config files
 ##   and RetroPie on Raspberry Pi 4 and 5 (32/64 bit)
@@ -19,7 +19,7 @@
 
 if [ $USER == "root" ]; then USERNAME=$SUDO_USER; else USERNAME=$USER; fi
 
-backtitle="Autostart Options and Config Editor for Sinden Lightgun - v3.05 -- By Widge"
+backtitle="Autostart Options and Config Editor for Sinden Lightgun - v3.05 -- By Widge & Updated By The SUPREME TEAM"
 utilscfg="/home/$USERNAME/Lightgun/utils/widgeutils.cfg"
 collectiondir="/opt/retropie/configs/all/emulationstation/collections"
 
